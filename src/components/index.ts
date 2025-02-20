@@ -1,4 +1,3 @@
-import Home from './Home'
 import Login from './Login'
 import Logout from './Logout'
 import SignUp from './SignUp'
@@ -8,9 +7,10 @@ import ProctectRoutes from './ProctectRoutes'
 import AuthButtons from './Home/AuthButtons'
 import Hero from './Home/Hero'
 import HomeFooter from './Home/Footer'
+import InputElement from './InputElement'
+import ButtonElement from './ButtonElement'
 
 export  {
-    Home,
     Login,
     Logout,
     SignUp,
@@ -19,5 +19,7 @@ export  {
     ProctectRoutes,
     AuthButtons,
     Hero,
-    HomeFooter
+    HomeFooter,
+    InputElement,
+    ButtonElement
 }

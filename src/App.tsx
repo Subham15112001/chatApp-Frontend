@@ -1,13 +1,12 @@
-import React from 'react'
-import { Footer, Navbar } from "./components/index";
 import { Outlet } from 'react-router';
+import useGetUser from './hooks/useGetUser'
 
 const App: React.FC = () => {
+ 
+  useGetUser()
   return (
     <>
-      
       <Outlet />
-     
     </>
   )
 }

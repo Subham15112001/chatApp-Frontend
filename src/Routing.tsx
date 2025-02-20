@@ -11,9 +11,7 @@ const Routing: FC = () => {
             <Routes>
                 <Route path='/' element={<App />}>
                     <Route index element={<HomePage />} />
-                    <Route path='login' element={<ProctectRoutes protectedRoutes={false}>
-                        <LoginPage />
-                    </ProctectRoutes>} />
+                    <Route path='login' element={<LoginPage/>}/>
                     <Route path='signup' element={<SignUpPage />} />
                 </Route>
             </Routes>

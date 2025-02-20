@@ -1,10 +1,11 @@
 import  { FC } from 'react'
+import { Login } from "../components/index";
 
 const LoginPage:FC = () => {
   return (
-    <div>
-      LoginPage
-    </div>
+    <>
+    <Login/>
+    </>
   )
 }
 

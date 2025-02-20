@@ -2,8 +2,10 @@ import { createAsyncThunk,createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserDataType {
     id: number,
-    name: string,
-    email: string
+    username: string,
+    email: string,
+    password:string
+    accessToken:string
 }
 
 interface UserTypes {
