@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 import { logout } from '../features/user/userSlice'
 import { RootState } from '../store/store'
 import { AxiosError, AxiosResponse, InternalAxiosRequestConfig, AxiosHeaders } from "axios";
-
+import Cookie from 'js-cookie'
 
 const useAxiosPrivate = () => {
 
@@ -14,13 +14,14 @@ const useAxiosPrivate = () => {
     const dispatch = useDispatch()
     const refresh = useRefreshToken()
     const userData = useSelector((state: RootState) => state.user.userData)
-
+    const accessToken = Cookie.get("accessToken")
+  
     useEffect(() => {
 
         const requestIntercept = axiosPrivate.interceptors.request.use(
             (config: InternalAxiosRequestConfig) => {
                 if (!config?.headers['Authorization']) {
-                    config.headers['Authorization'] = `Bearer ${userData?.accessToken}`;
+                    config.headers['Authorization'] = `Bearer ${accessToken}`;
                 }
                 return config;
             },
@@ -33,6 +34,8 @@ const useAxiosPrivate = () => {
                 const prevRequest = error?.config as InternalAxiosRequestConfig
 
                 if (!prevRequest) return Promise.reject(error);
+                
+                prevRequest.headers['x-retry'] = {}
 
                 if (error.response?.status === 401 && !prevRequest.headers['x-retry']) {
                     try {

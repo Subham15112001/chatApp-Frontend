@@ -50,7 +50,7 @@ const useLogin = () => {
             
             dispatch(login(resData))
             setErrorCode(201)
-            navigate("/",{replace:true})
+            navigate("/messageFrame",{replace:true})
         } catch (error ) {
             if (axios.isAxiosError(error)){
                 setErrorCode(error.status!)

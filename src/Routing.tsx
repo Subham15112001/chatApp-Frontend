@@ -2,8 +2,7 @@ import { FC } from 'react'
 import { Route, Routes } from "react-router";
 import { HomePage, LoginPage, SignUpPage } from './pages/index.ts'
 import App from './App.tsx'
-import ProctectRoutes from './components/ProctectRoutes.tsx';
-
+import MessageFrame from './components/MessageComponents/MessageFrame.tsx';
 
 const Routing: FC = () => {
     return (
@@ -13,6 +12,7 @@ const Routing: FC = () => {
                     <Route index element={<HomePage />} />
                     <Route path='login' element={<LoginPage/>}/>
                     <Route path='signup' element={<SignUpPage />} />
+                    <Route path='messageFrame' element={<MessageFrame/>}/>
                 </Route>
             </Routes>
         </div>

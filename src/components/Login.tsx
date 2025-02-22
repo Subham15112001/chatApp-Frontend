@@ -37,8 +37,6 @@ const Login: FC = () => {
             setErrorMessage("user does not exist")
         } else if (errorCode === 407) {
             setErrorMessage("password is incorrect")
-        }else{
-            setErrorMessage("An error occured")
         }
     },[errorCode])
 

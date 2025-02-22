@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { RootState } from '../store/store'
 import useAxiosPrivate from './useAxiosPrivate'
 import { login } from "../features/user/userSlice";
+import { replace, useNavigate } from 'react-router';
 
 
 type userResType = RootState['user']['userData']
@@ -11,6 +12,7 @@ const useGetUser = () => {
 
     const dispatch = useDispatch()
     const axiosPrivate = useAxiosPrivate()
+    const navigate = useNavigate()
 
     useEffect(() => {
 
@@ -41,7 +43,8 @@ const useGetUser = () => {
                 }
 
                 isMounted && dispatch(login(resData))
-
+                navigate("/messageFrame",{replace:true})
+                
             } catch (err) {
                 console.log(err)
             }
