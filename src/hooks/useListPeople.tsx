@@ -1,67 +1,61 @@
-import useAxiosPrivate from './useAxiosPrivate';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from "../api/axios"
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
+import useSocket from './useSocket'
 
-interface peopleListType {
+interface PeopleListType {
     email: string,
     id: number,
     lastSeen: string,
     username: string,
     online?: boolean
 }
-const useListPeople = () => {
 
+const useListPeople = () => {
     const [loading, setLoading] = useState<boolean>(false)
-    const [peopleList, setPeopleList] = useState<peopleListType[]>()
-    dayjs.extend(relativeTime);
-    const axiosPrivate = useAxiosPrivate()
+    const [peopleList, setPeopleList] = useState<PeopleListType[]>()
+    const socket = useSocket()
 
     useEffect(() => {
         const controller = new AbortController();
-        const main = async () => {
 
+        const fetchPeople = async () => {
+            setLoading(true)
             try {
-                setLoading(true)
                 const response = await api.get("/users/all-users", {
                     signal: controller.signal,
                     withCredentials: true
-                })
-                let data = response.data.data
-
-                data = data.map((val: peopleListType) => {
-                    if (!val.lastSeen) {
-                        val.lastSeen = ""
-                        return val
-                    }
-                    const currentDate = dayjs();
-                    const otherDate = dayjs(val.lastSeen);
-
-                    val.lastSeen = currentDate.to(otherDate)
-
-                    return val
-                })
-
-
-
-                console.log(data)
-                setPeopleList(data)
+                });
+                console.log(response)
+                setPeopleList(response.data.data)
             } catch (error) {
-                console.log(error)
+                console.error(error)
             } finally {
                 setLoading(false)
             }
-
         }
 
-        main()
+        const handleConnect = () => {
+            fetchPeople()
+        }
+
+        if (socket) {
+
+            if (socket.connected) {
+                fetchPeople()
+            }
+
+            socket.on("connect", handleConnect)
+        }
 
         return () => {
-            controller.abort()
-        }
 
-    }, [])
+            if (socket) {
+                controller.abort()
+                socket.off("connect", handleConnect)
+            }
+        }
+    }, [socket])
+
     return { peopleList, loading, setPeopleList }
 }
 

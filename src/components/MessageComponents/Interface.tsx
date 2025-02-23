@@ -1,90 +1,10 @@
-import { useEffect, useState } from 'react'
-import useSocket from "../../hooks/useSocket"
 import useListPeople from "../../hooks/useListPeople";
 
 const Interface = () => {
 
-    const socket = useSocket()
-    const { peopleList, loading, setPeopleList } = useListPeople()
-    const [onlineUsers, setOnlineUsers] = useState<Set<number>>(new Set<number>())
-
-    useEffect(() => {
-        if (socket) {
-
-            socket.on("online-users", (data) => {
-                const set = new Set<number>(data)
-                setOnlineUsers(set);
-
-            })
-
-            return () => {
-                socket.off("online-users")
-            }
-        }
-    }, [socket])
-
-    useEffect(() => {
-        if(loading) return
-        
-        peopleList?.map((val) => {
-            if (onlineUsers.has(val.id)) {
-                val.online = true;
-            } else {
-                val.online = false;
-            }
-            return val
-        })
-       
-        setPeopleList(peopleList)
-    }, [onlineUsers,loading])
-
-    const people = [
-        {
-            id: 1,
-            name: "John Doe",
-            lastMessage: "Sure, that sounds perfect!",
-            time: "2m ago",
-            unread: 2,
-            online: true,
-            avatar: "J"
-        },
-        {
-            id: 2,
-            name: "Sarah Wilson",
-            lastMessage: "When can we meet?",
-            time: "1h ago",
-            unread: 0,
-            online: true,
-            avatar: "S"
-        },
-        {
-            id: 3,
-            name: "Mike Johnson",
-            lastMessage: "The project is ready for review",
-            time: "3h ago",
-            unread: 1,
-            online: false,
-            avatar: "M"
-        },
-        {
-            id: 4,
-            name: "Emily Brown",
-            lastMessage: "Thanks for your help!",
-            time: "1d ago",
-            unread: 0,
-            online: false,
-            avatar: "E"
-        },
-        {
-            id: 5,
-            name: "David Clark",
-            lastMessage: "See you tomorrow!",
-            time: "1d ago",
-            unread: 0,
-            online: false,
-            avatar: "D"
-        }
-    ];
+   
+    const { peopleList, loading } = useListPeople()
+    
 
     return (
         <>
@@ -114,19 +34,17 @@ const Interface = () => {
                                     <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
                                         {person.username[0]}
                                     </div>
-                                    {person.online && (
+                                    {loading ? null : (person.online ? (
                                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                                    )}
-                                    {!person.online && (
-                                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
-                                    )}
+                                    ) : (<div className="absolute bottom-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>))}
+
                                 </div>
 
                                 {/* Content */}
                                 <div className="ml-4 flex-1">
                                     <div className="flex items-center justify-between">
                                         <h2 className="font-semibold">{person.username}</h2>
-                                        {!person.online && <span className="text-sm text-black">{person.lastSeen}</span>}
+                                        {!loading && !person.online && <span className="text-sm text-black">{person.lastSeen}</span>}
                                     </div>
                                     {/* <div className="flex items-center justify-between mt-1">
                                         <p className="text-sm text-gray-500 truncate">{person.lastMessage}</p>

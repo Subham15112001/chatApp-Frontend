@@ -7,23 +7,24 @@ const useSocket = () => {
 
     const [socket, setSocket] = useState<Socket | null>(null)
     const userId = useSelector((state: RootState) => state.user.userData?.id)
+  
 
     useEffect(() => {
 
         if (!userId) return
 
-        const main = async () => {
-            let socketInitialise = io(`http://localhost:8000?userId=${userId}`)
 
+        let socketInitialise = io(`http://localhost:8000?userId=${userId}`)
+
+        const upDateSocket = () => {
             setSocket(socketInitialise)
-
-            socketInitialise?.on("connect", () => {
-                console.log(socketInitialise.id)
-            })
         }
-        main()
+        socketInitialise?.on("connect", upDateSocket)
+
         return () => {
-            socket?.disconnect()
+            if (socket) {
+                socket?.off("connect", upDateSocket)
+            }
         }
     }, [userId])
     return socket
