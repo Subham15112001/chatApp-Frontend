@@ -7,6 +7,7 @@ import { logout } from '../features/user/userSlice'
 import { RootState } from '../store/store'
 import { AxiosError, AxiosResponse, InternalAxiosRequestConfig, AxiosHeaders } from "axios";
 import Cookie from 'js-cookie'
+import useLogout from "./useLogout";
 
 const useAxiosPrivate = () => {
 
@@ -15,7 +16,8 @@ const useAxiosPrivate = () => {
     const refresh = useRefreshToken()
     const userData = useSelector((state: RootState) => state.user.userData)
     const accessToken = Cookie.get("accessToken")
-  
+    const {logoutUser,loading} = useLogout()
+   
     useEffect(() => {
 
         const requestIntercept = axiosPrivate.interceptors.request.use(
@@ -55,6 +57,7 @@ const useAxiosPrivate = () => {
                     } catch (refreshError) {
                         console.log("axios Private catch error")
                         dispatch(logout());
+                        if (!loading) logoutUser();
                         navigate("/", { replace: true });
                         return Promise.reject(refreshError);
                     }
@@ -62,6 +65,8 @@ const useAxiosPrivate = () => {
 
                 if (error.response?.status === 403 || error.response?.status === 401) {
                     dispatch(logout());
+
+                    if(!loading) logoutUser();
                     navigate("/", { replace: true });
                 }
 

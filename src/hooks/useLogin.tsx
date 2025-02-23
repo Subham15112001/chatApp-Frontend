@@ -47,6 +47,8 @@ const useLogin = () => {
                 id,
                 username
             }
+
+            console.log(resData,"sdfasdfd asdf ")
             
             dispatch(login(resData))
             setErrorCode(201)
