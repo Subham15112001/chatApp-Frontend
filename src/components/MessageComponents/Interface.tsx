@@ -1,15 +1,62 @@
-import useListPeople from "../../hooks/useListPeople";
+import { useCallback, useEffect, useRef, useState } from "react"
+import useListPeople from "../../hooks/useListPeople"
+import useSocket from "../../hooks/useSocket"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "../../store/store"
+import { saveSender } from "../../features/messages/messagesSlice";
+
+type fetchDataType = {
+    roomId:number,
+    senderId:number,
+    receiverId:number
+}
 
 const Interface = () => {
 
    
     const { peopleList, loading } = useListPeople()
-    
+    const socket = useSocket()
+    const userId = useSelector((state:RootState) => state.user.userData?.id)
+    const senderId = useRef<number>(null)
+
+    const dispatch = useDispatch()
+
+    const fetchData = (data:fetchDataType) => {
+        dispatch(saveSender({
+            senderId:senderId.current,
+            roomId:data.roomId
+        }))
+    }
+
+    useEffect(() => {
+        if(!socket) return;
+        
+        socket.on("roomCreated",fetchData)
+
+        return () => {
+            socket.off("roomCreated",fetchData)
+        }
+
+    },[socket])
+
+    const handleClick = useCallback((data:number) =>{
+        
+        senderId.current = data
+       
+        if(!socket) return
+
+        socket.emit("joinRoom",{
+            user1:data,
+            user2:userId
+        })
+
+        
+    },[socket])
 
     return (
         <>
-            <div className='h-screen w-screen bg-white flex justify-center items-center'>
-                <div className="h-4/5 w-1/4 shadow-blue-600 shadow-lg p-4  flex flex-col bg-gradient-to-br from-blue-200 via-purple-100 to-pink-200">
+            <div className='h-full w-full bg-white flex justify-center items-center'>
+                <div className="h-full w-full shadow-blue-600 shadow-lg p-4  flex flex-col bg-gradient-to-br from-blue-200 via-purple-100 to-pink-200">
                     {/* Header */}
                     <div className="bg-white/80 backdrop-blur-sm p-4 shadow-md">
                         <h1 className="text-xl font-bold">Users</h1>
@@ -24,7 +71,10 @@ const Interface = () => {
 
                     {/* People List */}
                     {peopleList && <div className="flex-1 overflow-y-auto">
-                        {peopleList.map((person) => (
+                        {peopleList.map((person) => { 
+                            
+                            
+                            return (
                             <div
                                 key={person.id}
                                 className="flex items-center p-4 hover:bg-gray-400 transition-colors duration-200 cursor-pointer border-b border-gray-100 border-2 "
@@ -41,7 +91,7 @@ const Interface = () => {
                                 </div>
 
                                 {/* Content */}
-                                <div className="ml-4 flex-1">
+                                <div className="ml-4 flex-1" onClick={() => handleClick(person.id)}>
                                     <div className="flex items-center justify-between">
                                         <h2 className="font-semibold">{person.username}</h2>
                                         {!loading && !person.online && <span className="text-sm text-black">{person.lastSeen}</span>}
@@ -56,7 +106,7 @@ const Interface = () => {
                                     </div> */}
                                 </div>
                             </div>
-                        ))}
+                        )})}
                     </div>}
                 </div>
             </div>

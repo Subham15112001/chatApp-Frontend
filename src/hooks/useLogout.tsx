@@ -15,11 +15,11 @@ const useLogout = () => {
     const logoutUser = async () => {
         setLoading(true)
         try {
-            const response = await api.post("/users/logout",
+             await api.post("/users/logout",
                 {
                     withCredentials: true
                 })
-            console.log(response)
+            
         } catch (error) {
             console.log(error)
         }finally{

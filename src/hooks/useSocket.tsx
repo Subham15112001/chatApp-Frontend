@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { io, Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { updateData } from '../features/user/userSlice';
 
 const useSocket = () => {
 
     const [socket, setSocket] = useState<Socket | null>(null)
     const userId = useSelector((state: RootState) => state.user.userData?.id)
-  
+    const [isConnected,setIsConnected] = useState<boolean>(false)
 
     useEffect(() => {
 
@@ -18,6 +19,7 @@ const useSocket = () => {
 
         const upDateSocket = () => {
             setSocket(socketInitialise)
+            setIsConnected(true)
         }
         socketInitialise?.on("connect", upDateSocket)
 
@@ -26,7 +28,7 @@ const useSocket = () => {
                 socket?.off("connect", upDateSocket)
             }
         }
-    }, [userId])
+    }, [userId,isConnected])
     return socket
 }
 

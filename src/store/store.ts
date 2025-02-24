@@ -3,6 +3,7 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 import userSlice from '../features/user/userSlice'
+import messageSlice from '../features/messages/messagesSlice'
 
 import {
     FLUSH,
@@ -20,7 +21,8 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
-    user: userSlice
+    user: userSlice,
+    messages: messageSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

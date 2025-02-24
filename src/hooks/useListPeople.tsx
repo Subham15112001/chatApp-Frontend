@@ -1,62 +1,69 @@
-import { useEffect, useState } from 'react'
-import { api } from "../api/axios"
-import useSocket from './useSocket'
+
+// useListPeople.ts
+import { useEffect, useState, useCallback } from 'react';
+import { api } from "../api/axios";
+import useSocket from './useSocket';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 interface PeopleListType {
-    email: string,
-    id: number,
-    lastSeen: string,
-    username: string,
-    online?: boolean
+    email: string;
+    id: number;
+    lastSeen: string;
+    username: string;
+    online?: boolean;
+}
+
+interface OnlineUsersData {
+    userId: number;
+    status: boolean;
 }
 
 const useListPeople = () => {
-    const [loading, setLoading] = useState<boolean>(false)
-    const [peopleList, setPeopleList] = useState<PeopleListType[]>()
-    const socket = useSocket()
+    const [loading, setLoading] = useState<boolean>(false);
+    const [peopleList, setPeopleList] = useState<PeopleListType[]>([]);
+    const userId = useSelector((state:RootState) => state.user.userData?.id)
+    const socket = useSocket();
 
+    const fetchPeople = useCallback(async () => {
+        setLoading(true);
+        try {
+            const response = await api.get("/users/all-users", {
+                withCredentials: true
+            });
+
+            response.data.data = response.data.data.filter((val:any) =>{
+                return val.id !== userId
+            })
+            setPeopleList(response.data.data);
+        } catch (error) {
+            console.error('Error fetching people:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+   
     useEffect(() => {
-        const controller = new AbortController();
+        if (!socket) return;
 
-        const fetchPeople = async () => {
-            setLoading(true)
-            try {
-                const response = await api.get("/users/all-users", {
-                    signal: controller.signal,
-                    withCredentials: true
-                });
-                console.log(response)
-                setPeopleList(response.data.data)
-            } catch (error) {
-                console.error(error)
-            } finally {
-                setLoading(false)
-            }
+        // Initial fetch when socket connects
+        if (socket.connected) {
+            fetchPeople();
         }
 
-        const handleConnect = () => {
-            fetchPeople()
-        }
+        // Event listeners
+        socket.on("connect", fetchPeople);
+        socket.on("online-users", fetchPeople);
 
-        if (socket) {
-
-            if (socket.connected) {
-                fetchPeople()
-            }
-
-            socket.on("connect", handleConnect)
-        }
-
+        // Cleanup
         return () => {
+            socket.off("connect", fetchPeople);
+            socket.off("online-users", fetchPeople);
+        };
+    }, [socket, fetchPeople]);
 
-            if (socket) {
-                controller.abort()
-                socket.off("connect", handleConnect)
-            }
-        }
-    }, [socket])
+    return { peopleList, loading, setPeopleList };
+};
 
-    return { peopleList, loading, setPeopleList }
-}
-
-export default useListPeople
+export default useListPeople;

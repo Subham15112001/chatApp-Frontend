@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { compress, decompress } from 'lz-string'
+
 
 const ChatContainer = () => {
   const [messages, setMessages] = useState([
@@ -20,19 +22,19 @@ const ChatContainer = () => {
           time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
         }
       ]);
+      console.log(newMessage)
+      const compressed = compress(newMessage);
+      console.log(compressed);
+      console.log(typeof compressed)
+      const decompressed = decompress(compressed);
+      console.log(decompressed);
       setNewMessage("");
     }
   };
 
-  const handleKeyPress = (e:any) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
+ 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-full w-full bg-gray-100 shadow-blue-600 shadow-lg ml-2">
       {/* Chat Header */}
       <div className="bg-white shadow-md p-4 flex items-center border-b border-gray-200">
         <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold shadow-sm">
@@ -55,7 +57,7 @@ const ChatContainer = () => {
               <div
                 className={`relative max-w-[70%] px-4 py-3 ${message.sender
                     ? 'bg-blue-500 text-white rounded-t-2xl rounded-bl-2xl rounded-br-lg shadow-md'
-                    : 'bg-white text-gray-800 rounded-t-2xl rounded-br-2xl rounded-bl-lg shadow-md border border-gray-100'
+                    : 'bg-gray-400/70 text-gray-800 rounded-t-2xl rounded-br-2xl rounded-bl-lg shadow-md border border-gray-100'
                   }`}
               >
                 {/* Message tail */}
@@ -87,7 +89,6 @@ const ChatContainer = () => {
           <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
             placeholder="Type a message..."
             className="flex-1 resize-none rounded-full bg-gray-100 px-6 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors duration-200"
             rows={1}
