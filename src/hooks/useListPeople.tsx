@@ -12,12 +12,10 @@ interface PeopleListType {
     lastSeen: string;
     username: string;
     online?: boolean;
+    unread?:number,
+    lastMessage?:string
 }
 
-interface OnlineUsersData {
-    userId: number;
-    status: boolean;
-}
 
 const useListPeople = () => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -35,6 +33,7 @@ const useListPeople = () => {
             response.data.data = response.data.data.filter((val:any) =>{
                 return val.id !== userId
             })
+           
             setPeopleList(response.data.data);
         } catch (error) {
             console.error('Error fetching people:', error);
